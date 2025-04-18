@@ -1,5 +1,4 @@
 #include "states.hpp"
-
 //Funcion auxiliar
 // Interpolación lineal entre a y b, usando t (entre 0.0 y 1.0)
 float Lerp(float a, float b, float t) {
@@ -8,19 +7,11 @@ float Lerp(float a, float b, float t) {
 
 States::States(){
     currentScreen = MENU;
+    gameLvls.tuto.Init();
 }
 
 void States::GameMenu(Manentity_type& GE){
      // Bucle principal
-    //menuBackground = LoadTexture("resources/backgrounds/PNG/Battleground1/Bright/Battleground1.png");
-
-    auto& a1 = GE.createEntity_withCMPS<CmpRender>();
-	GE.defineCMP<CmpRender>(a1, CmpRender{400,550});
-    auto& a2 = GE.createEntity_withCMPS<CmpRender>();
-	GE.defineCMP<CmpRender>(a2, CmpRender{700,650});
-    auto& a3 = GE.createEntity_withCMPS<CmpRender>();
-	GE.defineCMP<CmpRender>(a3, CmpRender{900,750});
-    
     while (!WindowShouldClose()) {
         Vector2 mouse = GetMousePosition();
         BeginDrawing();
@@ -29,15 +20,14 @@ void States::GameMenu(Manentity_type& GE){
         float scaleX = static_cast<float>(GetScreenWidth()) / menuBackground.width;
         float scaleY = static_cast<float>(GetScreenHeight()) / menuBackground.height;
         DrawTextureEx(menuBackground, { 0, 0 }, 0.0f, std::max(scaleX, scaleY), WHITE);
-        DrawBackground();
-        GE.getEntityCMP<CmpRender>(a1).DrawShape();
-        GE.getEntityCMP<CmpRender>(a2).DrawShape();
-        GE.getEntityCMP<CmpRender>(a3).DrawShape();
+        
         if (currentScreen == MENU) {
+            DrawBackground();
             MenuInicial(mouse);
         }else if (currentScreen == GAME) {
             Juego(GE);
         }else if(currentScreen == SETTINGS){
+            DrawBackground();
             Ajustes();
         }else if(currentScreen == BYE){
             break; // Cierra la ventana
@@ -57,8 +47,8 @@ void States::MenuInicial(Vector2& mouse) {
     const int marginTop = 50;
 
     // Título con sombra para simular negrita
-    DrawText("Proyecto X", marginX + 3, marginTop + 3, titleFontSize, GRAY);
-    DrawText("Proyecto X", marginX, marginTop, titleFontSize, BLACK);
+    DrawText("ClickingDemons", marginX + 3, marginTop + 3, titleFontSize, GRAY);
+    DrawText("ClickingDemons", marginX, marginTop, titleFontSize, BLACK);
 
     int totalHeight = buttonCount * buttonFontSize + (buttonCount - 1) * spacing;
     int startY = (GetScreenHeight() * 3 / 4) - totalHeight / 2;
@@ -126,9 +116,15 @@ void States::MenuInicial(Vector2& mouse) {
 }
 
 void States::Juego(Manentity_type& GE){
-    DrawText("¡Juego en progreso!", 200, 200, 30, GREEN);
-    DrawText("Presiona B para volver", 200, 250, 20, GRAY);
-
+    float delta = GetFrameTime();
+    gameLvls.tuto.Update(delta, GE, RS);
+    gameLvls.tuto.Draw();
+    
+    //System updates
+    PS.update(GE);
+    RS.update(GE);
+    
+    //Return menu
     if (IsKeyPressed(KEY_B)) {
         currentScreen = MENU;
     }

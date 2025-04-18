@@ -31,5 +31,4 @@ struct CmpRender{
     CmpRender(float x, float y);
     CmpRender();
     Shape GenerateShape(Vector2 position);
-    void DrawShape();
 };

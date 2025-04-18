@@ -5,20 +5,23 @@
 #include "../cmp/tags.hpp"
 
 #include "../cmp/CmpRender.hpp"
+#include "../cmp/CmpPhysics.hpp"
 
 #include "../entitymanager.hpp"
 
 
 //ADD +1
-//TAGS : 34
-//CMPS : 16 
+//TAGS : 4
+//CMPS : 2 
 using TagList = 
 Typelist<TPlayer
         , TEnemy
         , THealth
+        , TRenderizable
         >;
 using ComponentList = 
 Typelist<CmpRender
+        , CmpPhysics
         >;
 
 using Manentity_type = ManEntity<ComponentList, TagList, 100>;

@@ -164,10 +164,6 @@ struct ManEntity {
     std::vector<Entity>& getEntityArray(){
         return entityarray;
     }
-    std::vector<Entity*>& getInventory(){
-        return inventory;
-    }
-
 
     Entity& getEntityByID(std::size_t const id){
         std::size_t cont = 0;
@@ -208,7 +204,6 @@ struct ManEntity {
 
         std::vector<Entity> entityarray{}; 
         storage_type components_{}; 
-        std::vector<Entity*> inventory{};
 };
 
 

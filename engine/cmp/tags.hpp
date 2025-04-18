@@ -12,3 +12,6 @@ struct TEnemy{};
 
 // HEALTH TAG --> NOT MUCH USE, ENTITY HEALTH YES OR NOT
 struct THealth{};
+
+// TAG PARA SABER SI DIBUJAR O NO UN OBJETO
+struct TRenderizable{};

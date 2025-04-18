@@ -7,9 +7,12 @@
 #include <string>
 #include <cmath>
 #include "../engine/utils/types.hpp"
+#include "Levels.hpp"
+#include "../engine/sys/RenderSystem.hpp"
+#include "../engine/sys/PhysicSystem.hpp"
 //Game screens
 enum GameScreen { MENU, GAME, SETTINGS, BYE };
-
+struct Levels{Tutorial tuto{};};
 class States{
     public:
     States();    
@@ -21,6 +24,14 @@ class States{
     void Ajustes();
     void DrawBackground();
 
+    //SYSTEMS
+    RenderSystem RS{};
+    PhysicSystem PS{};
+
+    //Levels
+    Levels gameLvls{};
+
+    //Game GUI Menu
     Cursor cursor{};
     GameScreen currentScreen;
     const int offsetX = 50;  // Mover todo hacia la derecha
@@ -37,12 +48,8 @@ class States{
     float hoverLineProgress[3] = {0};   // Para la línea inferior del botón
     float hoverOffsetX[3] = {0};  // Para el desplazamiento del botón
     static const int maxSquares = 100; //Densidad de la lluvia
-    struct Square {
-        Vector2 position;
-        float size;
-        float speed;
-        Color color;
-    }; // Lluvia
+
+    //Backgrounds
     Square squares[maxSquares]; //Lluvia
     bool backgroundInitialized = false; //Control del fondo dinamico del menu
 };

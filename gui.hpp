@@ -9,3 +9,10 @@ const int buttonCount = 3;
 //Tamaño de los botones de ajuste
 const int buttonWidth_sett = 200;
 const int buttonHeight_sett = 30;
+
+struct Square {
+    Vector2 position;
+    float size;
+    float speed;
+    Color color;
+}; // Lluvia
