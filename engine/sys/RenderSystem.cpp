@@ -6,8 +6,16 @@ void RenderSystem::update(Manentity_type& EM)
 { 
     auto update_one_entity = [&](Entity& e, CmpRender& crend, CmpPhysics& phy)
     { 
-        if (e.hasTag<TRenderizable>())
+        float deltaTime = GetFrameTime();
+        if(e.hasTag<TEnemy>()){
+            UpdateDemonShapeWithReturn(crend.spriteE.spritePoliUpdated, crend.spriteE.spritePoli, deltaTime) ;
+            DrawDemonShape(crend.spriteE.spritePoliUpdated, crend.spriteE.position, crend.spriteE.color, crend.spriteE.eyes, crend.spriteE.mouth);
+           
+        } else if (e.hasTag<TRenderizable>()){
             DrawShape(crend);
+        }
+        
+        
     };
     EM.foreach<SYSCMPs, SYSTAGs>(update_one_entity);
     
@@ -123,5 +131,94 @@ void RenderSystem::DrawShape(CmpRender& rend) {
         case ShapeType::STAR:
             DrawStarShape(rend.sprite);
             break;
+    }
+}
+
+void RenderSystem::DrawDemonShape(const std::vector<Vector2>& vertices, Vector2 position, Color color, const std::vector<Vector2>& eyes, const std::vector<Vector2>& mouth) {
+    // Crear un vector de vértices desplazados según la posición deseada
+    std::vector<Vector2> translatedVertices;
+    for (const auto& vertex : vertices) {
+        translatedVertices.push_back({ vertex.x + position.x, vertex.y + position.y });
+    }
+
+    // === OJOS CON PUPILAS DE SERPIENTE ===
+    Color eyeColor = RED;  // Generamos un color aleatorio para los ojos
+    for (const auto& eye : eyes) {
+        Vector2 eyePos = { eye.x + position.x, eye.y + position.y };
+        float radius = 6;
+
+        // Círculo del ojo
+        DrawCircleV(eyePos, radius, eyeColor);
+
+        // Pupila en forma de línea vertical
+        float pupilaHeight = radius * 1.2f;
+        Vector2 top = { eyePos.x, eyePos.y - pupilaHeight / 2 };
+        Vector2 bottom = { eyePos.x, eyePos.y + pupilaHeight / 2 };
+        DrawLineEx(top, bottom, 2, BLACK);
+    }
+
+    // === BOCA CON COLMILLOS ===
+    Color mouthColor = color;  // Generamos un color aleatorio para la boca
+    for (size_t i = 0; i < mouth.size() - 1; ++i) {
+        Vector2 p1 = { mouth[i].x + position.x, mouth[i].y + position.y };
+        Vector2 p2 = { mouth[i + 1].x + position.x, mouth[i + 1].y + position.y };
+        DrawLineV(p1, p2, mouthColor);
+    }
+
+    // Colmillos: ubicamos un par en puntos clave, pero con variación aleatoria
+    if (mouth.size() >= 3) {
+        // Definimos los índices para los colmillos
+        std::vector<size_t> fangIndices = {1, mouth.size() / 2, mouth.size() - 2};
+
+        // Dibujar los colmillos
+        for (size_t i : fangIndices) {
+            Vector2 base = { mouth[i].x + position.x, mouth[i].y + position.y };
+            
+            // Variación aleatoria en el tamaño y ángulo de los colmillos
+            std::random_device rd;
+            std::mt19937 rng(rd());
+            std::uniform_real_distribution<float> distSize(6.0f, 12.0f); // Tamaño del colmillo
+            std::uniform_real_distribution<float> distAngle(-0.1f, 0.1f); // Ángulo de variación del colmillo
+
+            float fangLength = distSize(rng);
+            float angleOffset = distAngle(rng);
+
+            // Ajustar la posición vertical de los colmillos para asegurarnos de que estén debajo de la boca
+            Vector2 fangBaseBelowMouth = { base.x, base.y + 6 };  // Movemos los colmillos hacia abajo un poco más
+            Vector2 fangTip = { fangBaseBelowMouth.x, fangBaseBelowMouth.y - fangLength };  // Colmillo hacia abajo
+
+            // Usamos un color aleatorio para los colmillos
+            Color fangColor = WHITE;
+
+            // Dibujar el colmillo
+            DrawLineV(fangBaseBelowMouth, fangTip, fangColor);
+        }
+    }
+
+    // Dibujar el contorno del polígono (líneas)
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        size_t nextIndex = (i + 1) % vertices.size();
+        Vector2 p1 = { vertices[i].x + position.x, vertices[i].y + position.y };
+        Vector2 p2 = { vertices[nextIndex].x + position.x, vertices[nextIndex].y + position.y };
+        DrawLineV(p1, p2, color);
+    }
+}
+
+void RenderSystem::UpdateDemonShapeWithReturn(std::vector<Vector2>& vertices, const std::vector<Vector2>& originalVertices, float deltaTime) {
+    static float timeElapsed = 0.0f;  // Tiempo acumulado para la animación
+    float moveSpeed = 2.0f;  // Velocidad de la interpolación, puedes ajustarla
+
+    // Incrementamos el tiempo transcurrido
+    timeElapsed += deltaTime;
+
+    // Factor de interpolación basado en el tiempo transcurrido
+    // Oscilamos entre 0 y 1 utilizando la función seno para obtener un movimiento suave
+    float t = (sin(timeElapsed * moveSpeed) + 1.0f) * 0.5f;  // [0, 1] a partir de la función seno
+
+    // Mover cada vértice de forma continua hacia su posición intermedia
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        // Interpolamos entre la posición original y la animada
+        vertices[i].x = originalVertices[i].x + (sin(timeElapsed + i) * 30.0f) * t;  // Movimiento suave en X
+        vertices[i].y = originalVertices[i].y + (cos(timeElapsed + i) * 30.0f) * t;  // Movimiento suave en Y
     }
 }

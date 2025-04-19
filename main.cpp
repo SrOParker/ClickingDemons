@@ -8,7 +8,7 @@ int main() {
     const int screenWidth = 1920;
     const int screenHeight = 1080;
     Manentity_type GE{};
-    States game{};
+    
     InitWindow(screenWidth, screenHeight, "ProyectoX");
     ClearWindowState(FLAG_WINDOW_RESIZABLE);
     ToggleFullscreen();
@@ -17,6 +17,7 @@ int main() {
     GuiSetFont(customFont);
     SetTargetFPS(60);
     HideCursor();
+    States game{GE};
     game.GameMenu(GE);
 
     return 0;

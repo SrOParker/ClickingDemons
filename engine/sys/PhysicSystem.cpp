@@ -14,4 +14,6 @@ void PhysicSystem::update(Manentity_type& EM){
 void PhysicSystem::ChangePosition(CmpRender& rend, CmpPhysics& phy){
     rend.sprite.position.x = phy.x;
     rend.sprite.position.y = phy.y;
+    rend.spriteE.position.x = phy.x;
+    rend.spriteE.position.y = phy.y;
 }

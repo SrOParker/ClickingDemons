@@ -4,7 +4,8 @@
 #include <vector>
 #include "../engine/utils/types.hpp"
 #include "../engine/sys/RenderSystem.hpp"
-
+#include "../engine/sys/PhysicSystem.hpp"
+#include <algorithm>
 // Estructura para el cuadro de texto con el efecto de escritura
 struct TextBox {
     std::vector<std::string> lines;
@@ -95,13 +96,13 @@ struct TextBox {
 
     bool Finished() const { return allFinished; }
 };
-
-// Estructura de nivel de tutorial
 struct Tutorial {
     enum Phase {
         INTRO = 0,
         BUTTON,
         AFTER_JOYA,
+        MOVE_JOYA,
+        ATTACK,
         DONE
     };
 
@@ -121,9 +122,23 @@ struct Tutorial {
         "Podrás usar este generador más adelante, cuando puedas pagarme su uso."
     };
 
+    std::vector<std::string> paragraphs_attack = {
+        "¡Cuidado, nos atacan!",
+        "Clica en el enemigo para derrotarlo",
+        "A partir de ahora te tocará descubrir y aprender por ti mismo. Ya eres mayorcito.",
+        "Acaba con este mequetrefe"
+    };
+
     TextBox textBox;
     bool readyForNext = false;
     bool joyaGenerada = false;
+    bool joyaInPlace = false;
+
+    Vector2 joyaCurrentPos = {0, 0};
+    Vector2 joyaTargetPos = {100, 120};
+    float joyaMoveTimer = 0.0f;
+
+    Entity joyaEntity;
 
     void Init() {
         textBox.Start(paragraphs_intro, 0.05f, 24);
@@ -136,6 +151,11 @@ struct Tutorial {
         joya.addTag<TRenderizable>();
         GE.defineCMP<CmpPhysics>(joya, CmpPhysics{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
         GE.defineCMP<CmpRender>(joya, CmpRender{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
+        joyaEntity = Entity(joya);
+    }
+
+    float Lerp(float a, float b, float t) {
+        return a + (b - a) * t;
     }
 
     void Update(float delta, Manentity_type& GE, RenderSystem& RS) {
@@ -143,7 +163,7 @@ struct Tutorial {
             case INTRO:
                 textBox.Update(delta);
                 if (textBox.Finished() && (IsKeyPressed(KEY_SPACE) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
-                    paragraphIndex++;std::cout<<paragraphIndex;
+                    paragraphIndex++;
                     if (paragraphIndex < paragraphs_intro.size()-3) {
                         textBox.Start({paragraphs_intro[paragraphIndex]}, 0.05f, 24);
                     } else {
@@ -152,8 +172,8 @@ struct Tutorial {
                 }
                 break;
 
-            case BUTTON:
-                if (!joyaGenerada && (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
+            case BUTTON: {
+                if (!joyaGenerada && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                     Vector2 mouse = GetMousePosition();
                     Rectangle btn = GetCenteredButtonRect(300, 80);
                     if (CheckCollisionPointRec(mouse, btn)) {
@@ -166,6 +186,7 @@ struct Tutorial {
                     }
                 }
                 break;
+            }
 
             case AFTER_JOYA:
                 textBox.Update(delta);
@@ -174,13 +195,53 @@ struct Tutorial {
                     if (paragraphIndex < paragraphs_after.size()-2) {
                         textBox.Start({paragraphs_after[paragraphIndex]}, 0.05f, 24);
                     } else {
+                        phase = MOVE_JOYA;
+                        joyaMoveTimer = 0.0f;
+                    }
+                }
+                break;
+
+            case MOVE_JOYA:
+                if (!joyaInPlace) {
+                    joyaMoveTimer += delta;
+                    float t = std::clamp(joyaMoveTimer / 1.0f, 0.0f, 1.0f);
+                    
+                    // Aseguramos que la joya esté dentro de los límites del recuadro de la interfaz
+                    float targetX = joyaTargetPos.x;
+                    float targetY = joyaTargetPos.y;
+                    
+                    // Lerp ajustado para que la joya no se mueva fuera del recuadro
+                    joyaCurrentPos.x = Lerp((float)GetScreenWidth() / 2, targetX, t);
+                    joyaCurrentPos.y = Lerp((float)GetScreenHeight() / 2, targetY, t);
+
+                    // Actualizar la posición de la joya en la física
+                    auto& phys = GE.getEntityCMP<CmpPhysics>(joyaEntity);
+                    phys.x = joyaCurrentPos.x;
+                    phys.y = joyaCurrentPos.y;
+
+                    if (t >= 1.0f) {
+                        joyaInPlace = true;
+                        paragraphIndex = 0;
+                        phase = ATTACK;
+                        textBox.Start(paragraphs_attack, 0.05f, 24);
+                    }
+                }
+                
+                break;
+
+            case ATTACK:
+                textBox.Update(delta);
+                if (textBox.Finished() && (IsKeyPressed(KEY_SPACE) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
+                    paragraphIndex++;
+                    if (paragraphIndex < paragraphs_attack.size()-3) {
+                        textBox.Start({paragraphs_attack[paragraphIndex]}, 0.05f, 24);
+                    } else {
                         phase = DONE;
                     }
                 }
                 break;
 
             case DONE:
-                // Final del tutorial
                 break;
         }
     }
@@ -189,17 +250,29 @@ struct Tutorial {
         switch (phase) {
             case INTRO:
             case AFTER_JOYA:
+            case MOVE_JOYA:
+            case ATTACK:
                 textBox.Draw(DARKBLUE, SKYBLUE, RAYWHITE);
+
+                // Dibujo de los huecos para joyas (más grandes ahora)
+                for (int i = 0; i < 5; ++i) {
+                    // Dibujo del recuadro más grande para las joyas
+                    Rectangle slot = { joyaTargetPos.x - 25, joyaTargetPos.y - 25 + i * 100, 50, 50 }; // Ajusta el tamaño de los recuadros
+                    DrawRectangleRounded(slot, 0.2f, 4, Fade(GRAY, 0.25f));
+                }
+
                 break;
-            case BUTTON:{
+
+            case BUTTON: {
                 Rectangle btn = GetCenteredButtonRect(300, 80);
                 Vector2 mouse = GetMousePosition();
                 bool hovered = CheckCollisionPointRec(mouse, btn);
                 DrawCofreButtonFancy(btn, hovered);
                 break;
             }
+
             case DONE:
-                DrawText("Tutorial finalizado", 100, 100, 24, WHITE);
+                //pasar a nivel siguiente
                 break;
         }
     }
@@ -207,7 +280,7 @@ struct Tutorial {
     Rectangle GetCenteredButtonRect(int width, int height) {
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
-        return {(float)(screenWidth - width) / 2, (float)(screenHeight - height) / 2, (float)width, (float)height};
+        return { (float)(screenWidth - width) / 2, (float)(screenHeight - height) / 2, (float)width, (float)height };
     }
 
     void DrawCofreButtonFancy(Rectangle btn, bool hovered) {
@@ -297,5 +370,26 @@ struct Tutorial {
             DrawRectangleRounded(btn, 0.25f, 8, baseColor);
         }
     }
-    
+};
+
+
+struct Level{
+    bool playingLvl{true};
+    Level(){};
+    Level(Manentity_type& GE){
+        GenerarEnemigo(GE);
+    }
+    void GenerarEnemigo(Manentity_type& GE){
+        int screenWidth = GetScreenWidth();
+        int screenHeight = GetScreenHeight();
+        auto& enemy = GE.createEntity_withCMPS<CmpRender, CmpPhysics>();
+        enemy.addTag<TRenderizable>();enemy.addTag<TEnemy>();
+        GE.defineCMP<CmpPhysics>(enemy, CmpPhysics{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
+        GE.defineCMP<CmpRender>(enemy, CmpRender{0,0,0});
+    }
+    void LvlPlay(Manentity_type& GE, RenderSystem& RS, PhysicSystem& PS){
+            
+            PS.update(GE);
+            RS.update(GE);
+    }
 };

@@ -5,9 +5,13 @@ float Lerp(float a, float b, float t) {
     return a + (b - a) * t;
 }
 
-States::States(){
+States::States(Manentity_type& GE){
     currentScreen = MENU;
-    gameLvls.tuto.Init();
+    if (lastlvl == 0){
+        gameLvls.tuto.Init();
+    }else{
+        gameLvls.lvl = Level{GE};
+    }
 }
 
 void States::GameMenu(Manentity_type& GE){
@@ -116,14 +120,18 @@ void States::MenuInicial(Vector2& mouse) {
 }
 
 void States::Juego(Manentity_type& GE){
-    float delta = GetFrameTime();
-    gameLvls.tuto.Update(delta, GE, RS);
-    gameLvls.tuto.Draw();
-    
-    //System updates
-    PS.update(GE);
-    RS.update(GE);
-    
+    //Tutorial
+    if (lastlvl == 0){
+        float delta = GetFrameTime();
+        gameLvls.tuto.Update(delta, GE, RS);
+        gameLvls.tuto.Draw();
+        
+        //System updates
+        PS.update(GE);
+        RS.update(GE);
+    }else{ // Juego
+        gameLvls.lvl.LvlPlay(GE, RS, PS);
+    }
     //Return menu
     if (IsKeyPressed(KEY_B)) {
         currentScreen = MENU;

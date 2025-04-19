@@ -12,10 +12,10 @@
 #include "../engine/sys/PhysicSystem.hpp"
 //Game screens
 enum GameScreen { MENU, GAME, SETTINGS, BYE };
-struct Levels{Tutorial tuto{};};
+struct Levels{Tutorial tuto{}; Level lvl;};
 class States{
     public:
-    States();    
+    States(Manentity_type& GE);    
     void GameMenu(Manentity_type& GE);
 
     private:
@@ -29,7 +29,8 @@ class States{
     PhysicSystem PS{};
 
     //Levels
-    Levels gameLvls{};
+    Levels gameLvls;
+    int lastlvl{1};
 
     //Game GUI Menu
     Cursor cursor{};
