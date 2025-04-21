@@ -12,7 +12,7 @@ void RenderSystem::update(Manentity_type& EM)
             UpdateDemonShapeWithReturn(crend.spriteE.spritePoliUpdated, crend.spriteE.spritePoli, deltaTime) ;
             DrawDemonShape(crend.spriteE.spritePoliUpdated, crend.spriteE.position, crend.spriteE.color, crend.spriteE.eyes, crend.spriteE.mouth);
            
-        } else if (e.hasTag<TRenderizable>()){
+        } else if (e.hasTag<TRenderizable>() && e.hasTag<TJewel>() && e.hasTag<TActiveJewel>()){
             DrawShape(crend);
         }
         

@@ -116,7 +116,7 @@ float GetRandomRadius(float minRadius, float maxRadius) {
 
 // Generar un vértice de un polígono aleatorio
 Vector2 GenerateVertex(float radius, float angle) {
-    return { radius * cos(angle), radius * sin(angle) };
+    return { (float)(radius * cos(angle)), (float)(radius * sin(angle)) };
 }
 
 

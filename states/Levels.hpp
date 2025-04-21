@@ -152,10 +152,13 @@ struct Tutorial {
     void generarJoya(Manentity_type& GE) {
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
-        auto& joya = GE.createEntity_withCMPS<CmpRender, CmpPhysics>();
+        auto& joya = GE.createEntity_withCMPS<CmpRender, CmpPhysics, CmpInformation>();
         joya.addTag<TRenderizable>();
+        joya.addTag<TJewel>();
+        joya.addTag<TActiveJewel>();
         GE.defineCMP<CmpPhysics>(joya, CmpPhysics{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
         GE.defineCMP<CmpRender>(joya, CmpRender{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
+        GE.defineCMP<CmpInformation>(joya, CmpInformation{5,0,0,0,"Attack +5",0,0});
         joyaEntity = Entity(joya);
     }
 

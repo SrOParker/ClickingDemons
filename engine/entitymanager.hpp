@@ -164,6 +164,7 @@ struct ManEntity {
     std::vector<Entity>& getEntityArray(){
         return entityarray;
     }
+    template <typename TAG>
 
     Entity& getEntityByID(std::size_t const id){
         std::size_t cont = 0;

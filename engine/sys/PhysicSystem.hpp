@@ -10,5 +10,5 @@ struct PhysicSystem {
     void update(Manentity_type& EM);
 
     private:
-    void ChangePosition(CmpRender& rend, CmpPhysics& phy); 
+    void ChangePosition(Entity& e, CmpRender& rend, CmpPhysics& phy); 
 };

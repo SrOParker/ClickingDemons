@@ -3,7 +3,7 @@ TARGET = main
 
 # Archivos fuente
 SRC = main.cpp states/states.cpp cursor/cursor.cpp \
-engine/cmp/CmpRender.cpp engine/cmp/CmpPhysics.cpp engine/cmp/CmpInformation.cpp engine/cmp/CmpJewel.cpp\
+engine/cmp/CmpRender.cpp engine/cmp/CmpPhysics.cpp engine/cmp/CmpInformation.cpp \
 engine/sys/RenderSystem.cpp engine/sys/PhysicSystem.cpp engine/sys/InputSystem.cpp engine/sys/InformationSystem.cpp 
 
 

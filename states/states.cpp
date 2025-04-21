@@ -7,7 +7,7 @@ float Lerp(float a, float b, float t) {
 void CreatePlayer(Manentity_type& GE){
     int screenWidth = GetScreenWidth();
     int screenHeight = GetScreenHeight();
-    auto& player = GE.createEntity_withCMPS<CmpInformation, CmpJewel>();
+    auto& player = GE.createEntity_withCMPS<CmpInformation>();
     player.addTag<TPlayer>();
     GE.defineCMP<CmpInformation>(player, CmpInformation{1,0,1000,0,"Jugador",0,0});
 }

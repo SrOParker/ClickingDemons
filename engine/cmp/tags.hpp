@@ -15,3 +15,7 @@ struct THealth{};
 
 // TAG PARA SABER SI DIBUJAR O NO UN OBJETO
 struct TRenderizable{};
+
+// TAG PARA SABER SI ES UNA JOYA
+struct TJewel{};
+struct TActiveJewel{};
