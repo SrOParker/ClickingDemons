@@ -8,8 +8,7 @@
 #include <cmath>
 #include "../engine/utils/types.hpp"
 #include "Levels.hpp"
-#include "../engine/sys/RenderSystem.hpp"
-#include "../engine/sys/PhysicSystem.hpp"
+
 //Game screens
 enum GameScreen { MENU, GAME, SETTINGS, BYE };
 struct Levels{Tutorial tuto{}; Level lvl;};
@@ -27,11 +26,12 @@ class States{
     //SYSTEMS
     RenderSystem RS{};
     PhysicSystem PS{};
-
+    InputSystem  IS{};
+    InformationSystem InfS{};
     //Levels
     Levels gameLvls;
-    int lastlvl{1};
-
+    int lastlvl{0}; 
+    int initLvl{0};
     //Game GUI Menu
     Cursor cursor{};
     GameScreen currentScreen;

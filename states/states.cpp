@@ -4,6 +4,13 @@
 float Lerp(float a, float b, float t) {
     return a + (b - a) * t;
 }
+void CreatePlayer(Manentity_type& GE){
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+    auto& player = GE.createEntity_withCMPS<CmpInformation, CmpJewel>();
+    player.addTag<TPlayer>();
+    GE.defineCMP<CmpInformation>(player, CmpInformation{1,0,1000,0,"Jugador",0,0});
+}
 
 States::States(Manentity_type& GE){
     currentScreen = MENU;
@@ -16,6 +23,7 @@ States::States(Manentity_type& GE){
 
 void States::GameMenu(Manentity_type& GE){
      // Bucle principal
+    CreatePlayer(GE);
     while (!WindowShouldClose()) {
         Vector2 mouse = GetMousePosition();
         BeginDrawing();
@@ -121,16 +129,24 @@ void States::MenuInicial(Vector2& mouse) {
 
 void States::Juego(Manentity_type& GE){
     //Tutorial
+    
     if (lastlvl == 0){
         float delta = GetFrameTime();
-        gameLvls.tuto.Update(delta, GE, RS);
+        gameLvls.tuto.Update(delta, GE, RS, lastlvl);
         gameLvls.tuto.Draw();
         
         //System updates
         PS.update(GE);
         RS.update(GE);
+        if(lastlvl == 1){
+            initLvl = 1;
+        }
     }else{ // Juego
-        gameLvls.lvl.LvlPlay(GE, RS, PS);
+        if (initLvl == 1){
+            gameLvls.lvl = Level{GE};
+            initLvl =0 ;
+        }
+        gameLvls.lvl.LvlPlay(GE, RS, PS, IS, InfS);
     }
     //Return menu
     if (IsKeyPressed(KEY_B)) {

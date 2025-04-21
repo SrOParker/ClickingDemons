@@ -5,7 +5,12 @@
 #include "../engine/utils/types.hpp"
 #include "../engine/sys/RenderSystem.hpp"
 #include "../engine/sys/PhysicSystem.hpp"
+#include "../engine/sys/InputSystem.hpp"
+#include "../engine/sys/InformationSystem.hpp"
 #include <algorithm>
+
+static Entity* activeEnemy;
+
 // Estructura para el cuadro de texto con el efecto de escritura
 struct TextBox {
     std::vector<std::string> lines;
@@ -158,7 +163,7 @@ struct Tutorial {
         return a + (b - a) * t;
     }
 
-    void Update(float delta, Manentity_type& GE, RenderSystem& RS) {
+    void Update(float delta, Manentity_type& GE, RenderSystem& RS, int& lvl) {
         switch (phase) {
             case INTRO:
                 textBox.Update(delta);
@@ -242,6 +247,7 @@ struct Tutorial {
                 break;
 
             case DONE:
+                lvl = 1;
                 break;
         }
     }
@@ -253,14 +259,6 @@ struct Tutorial {
             case MOVE_JOYA:
             case ATTACK:
                 textBox.Draw(DARKBLUE, SKYBLUE, RAYWHITE);
-
-                // Dibujo de los huecos para joyas (más grandes ahora)
-                for (int i = 0; i < 5; ++i) {
-                    // Dibujo del recuadro más grande para las joyas
-                    Rectangle slot = { joyaTargetPos.x - 25, joyaTargetPos.y - 25 + i * 100, 50, 50 }; // Ajusta el tamaño de los recuadros
-                    DrawRectangleRounded(slot, 0.2f, 4, Fade(GRAY, 0.25f));
-                }
-
                 break;
 
             case BUTTON: {
@@ -382,13 +380,16 @@ struct Level{
     void GenerarEnemigo(Manentity_type& GE){
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
-        auto& enemy = GE.createEntity_withCMPS<CmpRender, CmpPhysics>();
+        auto& enemy = GE.createEntity_withCMPS<CmpRender, CmpPhysics, CmpInformation>();
         enemy.addTag<TRenderizable>();enemy.addTag<TEnemy>();
         GE.defineCMP<CmpPhysics>(enemy, CmpPhysics{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
         GE.defineCMP<CmpRender>(enemy, CmpRender{0,0,0});
+        GE.defineCMP<CmpInformation>(enemy, CmpInformation{});
+        activeEnemy = &enemy;
     }
-    void LvlPlay(Manentity_type& GE, RenderSystem& RS, PhysicSystem& PS){
-            
+    void LvlPlay(Manentity_type& GE, RenderSystem& RS, PhysicSystem& PS, InputSystem& IS, InformationSystem& InfS){
+            InfS.update(GE);
+            IS.update(GE, *activeEnemy);
             PS.update(GE);
             RS.update(GE);
     }

@@ -4,6 +4,7 @@ RenderSystem::RenderSystem(){}
 
 void RenderSystem::update(Manentity_type& EM) 
 { 
+    PaintGameInterface();
     auto update_one_entity = [&](Entity& e, CmpRender& crend, CmpPhysics& phy)
     { 
         float deltaTime = GetFrameTime();
@@ -220,5 +221,15 @@ void RenderSystem::UpdateDemonShapeWithReturn(std::vector<Vector2>& vertices, co
         // Interpolamos entre la posición original y la animada
         vertices[i].x = originalVertices[i].x + (sin(timeElapsed + i) * 30.0f) * t;  // Movimiento suave en X
         vertices[i].y = originalVertices[i].y + (cos(timeElapsed + i) * 30.0f) * t;  // Movimiento suave en Y
+    }
+}
+
+void RenderSystem::PaintGameInterface(){
+    Vector2 joyaTargetPos = {100, 120};
+    // Dibujo de los huecos para joyas (más grandes ahora)
+    for (int i = 0; i < 5; ++i) {
+        // Dibujo del recuadro más grande para las joyas
+        Rectangle slot = { joyaTargetPos.x - 25, joyaTargetPos.y - 25 + i * 100, 50, 50 }; // Ajusta el tamaño de los recuadros
+        DrawRectangleRounded(slot, 0.2f, 4, Fade(GRAY, 0.25f));
     }
 }

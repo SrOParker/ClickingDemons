@@ -1,4 +1,4 @@
-
+#pragma once
 struct CmpPhysics{
     float x,y;
     CmpPhysics();

@@ -6,13 +6,13 @@
 
 #include "../cmp/CmpRender.hpp"
 #include "../cmp/CmpPhysics.hpp"
-
+#include "../cmp/CmpInformation.hpp"
 #include "../entitymanager.hpp"
 
 
 //ADD +1
 //TAGS : 4
-//CMPS : 2 
+//CMPS : 4 
 using TagList = 
 Typelist<TPlayer
         , TEnemy
@@ -22,6 +22,7 @@ Typelist<TPlayer
 using ComponentList = 
 Typelist<CmpRender
         , CmpPhysics
+        , CmpInformation
         >;
 
 using Manentity_type = ManEntity<ComponentList, TagList, 100>;
