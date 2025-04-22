@@ -19,3 +19,6 @@ struct TRenderizable{};
 // TAG PARA SABER SI ES UNA JOYA
 struct TJewel{};
 struct TActiveJewel{};
+
+// TAG PARA RENDERIZAR EN EL CENTRO LA JOYA DEL TUTORIAL
+struct TTutorial {};

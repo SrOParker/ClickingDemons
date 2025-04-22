@@ -14,6 +14,8 @@ void RenderSystem::update(Manentity_type& EM)
            
         } else if (e.hasTag<TRenderizable>() && e.hasTag<TJewel>() && e.hasTag<TActiveJewel>()){
             DrawShape(crend);
+        } else if (e.hasTag<TTutorial>()){
+            DrawShape(crend);
         }
         
         
@@ -39,15 +41,17 @@ void DrawCircleShape(Shape& shape) {
 
 void DrawRectangleShape(Shape& shape) {
     // Dibuja el rectángulo
-    DrawRectangleV(shape.position, (Vector2){shape.size, shape.size * 2}, shape.color);
+    float shapeReposX = 15;
+    float shapeReposY = 28;
+    DrawRectangleV(Vector2(shape.position.x -shapeReposX, shape.position.y -shapeReposY), (Vector2){shape.size, shape.size * 2}, shape.color);
 
     if (shape.hasBorder) {
-        DrawRectangleLines(shape.position.x, shape.position.y, shape.size, shape.size * 2, shape.borderColor); // Borde
+        DrawRectangleLines(shape.position.x-shapeReposX, shape.position.y-shapeReposY, shape.size, shape.size * 2, shape.borderColor); // Borde
     }
 
     if (shape.hasInnerShape) {
         float innerSize = shape.size * 0.5f; // Tamaño más pequeño para forma interna
-        DrawRectangleV((Vector2){shape.position.x + (shape.size * 0.25f), shape.position.y + (shape.size * 0.25f)}, (Vector2){innerSize, innerSize * 2}, shape.innerColor); // Rectángulo interno
+        DrawRectangleV((Vector2){shape.position.x-shapeReposX + (shape.size * 0.25f), shape.position.y-shapeReposY + (shape.size * 0.25f)}, (Vector2){innerSize, innerSize * 2}, shape.innerColor); // Rectángulo interno
     }
 }
 

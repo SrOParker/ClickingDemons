@@ -110,7 +110,7 @@ struct Tutorial {
         ATTACK,
         DONE
     };
-
+    int idJewelTuto{};
     Phase phase = INTRO;
     size_t paragraphIndex = 0;
 
@@ -153,9 +153,10 @@ struct Tutorial {
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
         auto& joya = GE.createEntity_withCMPS<CmpRender, CmpPhysics, CmpInformation>();
+        idJewelTuto = joya.getID();
         joya.addTag<TRenderizable>();
         joya.addTag<TJewel>();
-        joya.addTag<TActiveJewel>();
+        joya.addTag<TTutorial>();
         GE.defineCMP<CmpPhysics>(joya, CmpPhysics{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
         GE.defineCMP<CmpRender>(joya, CmpRender{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
         GE.defineCMP<CmpInformation>(joya, CmpInformation{5,0,0,0,"Attack +5",0,0});
@@ -238,6 +239,7 @@ struct Tutorial {
                 break;
 
             case ATTACK:
+                
                 textBox.Update(delta);
                 if (textBox.Finished() && (IsKeyPressed(KEY_SPACE) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
                     paragraphIndex++;
@@ -245,6 +247,8 @@ struct Tutorial {
                         textBox.Start({paragraphs_attack[paragraphIndex]}, 0.05f, 24);
                     } else {
                         phase = DONE;
+                        GE.getEntityByID(idJewelTuto).addTag<TActiveJewel>();
+                        GE.getEntityByID(idJewelTuto).eraseTag<TTutorial>();
                     }
                 }
                 break;

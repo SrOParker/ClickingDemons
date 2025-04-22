@@ -11,7 +11,7 @@
 
 
 //ADD +1
-//TAGS : 6
+//TAGS : 7
 //CMPS : 3 
 using TagList = 
 Typelist<TPlayer
@@ -20,6 +20,7 @@ Typelist<TPlayer
         , TRenderizable
         , TJewel
         , TActiveJewel
+        , TTutorial
         >;
 using ComponentList = 
 Typelist<CmpRender
