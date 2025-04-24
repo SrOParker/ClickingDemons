@@ -13,6 +13,7 @@ std::vector<Entity> getActiveJewels(Manentity_type& EM){
 }
 
 void InformationSystem::update(Manentity_type& EM, Entity& activeEnemy, int& actualLvl){
+    
     auto update_one_entity = [&](Entity& e, CmpInformation& cinfo)
     { 
         if (e.hasTag<TPlayer>()){

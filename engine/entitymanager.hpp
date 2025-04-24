@@ -119,16 +119,6 @@ struct ManEntity {
 
     template <typename... Ts> 
     void FunctionToEachOneInPackErase(Entity& e) {  (... , eraseEntityCMP<Ts>(e));  }
-    //template <typename T, typename... Ts>
-    //void FunctionToEachOneInPack(){
-    //    if constexpr (sizeof...(Ts) !=0 ){
-    //        addComponentToEntity<T>();
-    //        FunctionToEachOneInPack< Ts... >();
-    //    }else{
-    //        addComponentToEntity<T>();
-    //    }
-    //}
-
 
     template <typename CMP>
     CMP& addComponentToEntity(Entity& e){
