@@ -22,7 +22,7 @@ CmpRender::CmpRender(int sides, float radius, float variation)
     std::uniform_int_distribution<int> distSides(100, 200);        // [65, 164]
     std::uniform_real_distribution<float> distRadius(30.f, 130.f); // [30.0, 130.0]
     std::uniform_real_distribution<float> distVar(10.f, 50.f);     // [10.0, 50.0]
-    
+    std::uniform_real_distribution<float> what(10.f, 50.f); 
     if (sides == 0 && radius == 0 && variation == 0) {
         sides = distSides(rng);
         radius = distRadius(rng);

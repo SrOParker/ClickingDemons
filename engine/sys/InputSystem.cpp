@@ -19,10 +19,10 @@ void InputSystem::HitAnEnemy(CmpInformation& cinfoPlayer, CmpInformation& cinfoE
     int screenHeight = GetScreenHeight();
 
     Rectangle centralZone = {
-        screenWidth / 2 - 200,
-        screenHeight / 2 - 200,
-        400,
-        400
+        screenWidth / 2 - 300,
+        screenHeight / 2 - 300,
+        600,
+        600
     };
     DrawRectangleLinesEx(centralZone, 2, RED);
 

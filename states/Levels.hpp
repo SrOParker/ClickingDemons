@@ -159,7 +159,7 @@ struct Tutorial {
         joya.addTag<TTutorial>();
         GE.defineCMP<CmpPhysics>(joya, CmpPhysics{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
         GE.defineCMP<CmpRender>(joya, CmpRender{(float)(screenWidth) / 2, (float)(screenHeight) / 2});
-        GE.defineCMP<CmpInformation>(joya, CmpInformation{5,0,0,0,"Attack +5",0,0});
+        GE.defineCMP<CmpInformation>(joya, CmpInformation{5,0,0,0,0,"Attack +5",0,0});
         joyaEntity = Entity(joya);
     }
 
@@ -187,7 +187,7 @@ struct Tutorial {
                     Rectangle btn = GetCenteredButtonRect(300, 80);
                     if (CheckCollisionPointRec(mouse, btn)) {
                         generarJoya(GE);
-                        RS.update(GE);
+                        RS.update(GE, lvl);
                         joyaGenerada = true;
                         phase = AFTER_JOYA;
                         paragraphIndex = 0;
@@ -394,10 +394,10 @@ struct Level{
         GE.defineCMP<CmpInformation>(enemy, CmpInformation{});
         activeEnemy = &enemy;
     }
-    void LvlPlay(Manentity_type& GE, RenderSystem& RS, PhysicSystem& PS, InputSystem& IS, InformationSystem& InfS){
-            InfS.update(GE);
+    void LvlPlay(Manentity_type& GE, RenderSystem& RS, PhysicSystem& PS, InputSystem& IS, InformationSystem& InfS, int& actualLvl){
+            InfS.update(GE,*activeEnemy, actualLvl);
             IS.update(GE, *activeEnemy);
             PS.update(GE);
-            RS.update(GE);
+            RS.update(GE,actualLvl);
     }
 };

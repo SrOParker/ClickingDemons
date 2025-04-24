@@ -10,20 +10,23 @@ CmpInformation::CmpInformation() {
     std::uniform_real_distribution<float> distCrit(0.0f, 1.0f);
     std::uniform_int_distribution<int> distPower(5, 50);
 
-    this->health = distHealth(rng);
+    this->health = 100 + nextAmountOfHealth;
+    this->maxhealth = health;
     this->basicArmor = distArmor(rng);
     this->magicArmor = distArmor(rng);
     this->money = distMoney(rng);
     this->criticalStrikeChance = distCrit(rng);
     this->powerAttack = distPower(rng);
-    
+
     // Si quieres una descripción aleatoria simple:
     this->description = "Enemigo básico";
+    nextAmountOfHealth+=10;
 }
 
 CmpInformation::CmpInformation( std::size_t powerAttack, 
     std::size_t criticalStrikeChance, 
     std::size_t health, 
+    std::size_t maxhealth,
     std::size_t money, 
     std::string description,
     std::size_t magicArmor,
@@ -32,6 +35,7 @@ CmpInformation::CmpInformation( std::size_t powerAttack,
     this->criticalStrikeChance = criticalStrikeChance;
     this->description = description;
     this->health = health;
+    this->maxhealth = health;
     this->magicArmor= magicArmor;
     this->money = money;
     this->powerAttack = powerAttack;

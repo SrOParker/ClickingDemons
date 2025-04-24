@@ -32,6 +32,7 @@ class States{
     Levels gameLvls;
     int lastlvl{0}; 
     int initLvl{0};
+    int actualLvl{1};
     //Game GUI Menu
     Cursor cursor{};
     GameScreen currentScreen;

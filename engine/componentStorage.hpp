@@ -47,7 +47,9 @@ struct ComponentStorage {
     constexpr auto addComponent(CMP c) noexcept {
         return getStorage<CMP>().push_back(c);
     }
-
+    
+    template <typename CMP>
+    void eraseCMP(key_type key){ getStorage<CMP>().erase({key.id, key.gen}); }
     
     void clearCS(){ clearImplementation(typelist_with_slots{}); }
 

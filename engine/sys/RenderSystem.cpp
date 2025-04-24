@@ -1,14 +1,18 @@
 #include "RenderSystem.hpp"
 
-RenderSystem::RenderSystem(){}
+RenderSystem::RenderSystem(){
+    InitDynamicBackground();
+}
 
-void RenderSystem::update(Manentity_type& EM) 
+void RenderSystem::update(Manentity_type& EM, int& actualLvl) 
 { 
     PaintGameInterface();
-    auto update_one_entity = [&](Entity& e, CmpRender& crend, CmpPhysics& phy)
+    DrawDynamicBackground();
+    auto update_one_entity = [&](Entity& e, CmpRender& crend, CmpPhysics& phy, CmpInformation& cinf)
     { 
         float deltaTime = GetFrameTime();
         if(e.hasTag<TEnemy>()){
+            DrawEnemyHealthBar(cinf.health, cinf.maxhealth, actualLvl);
             UpdateDemonShapeWithReturn(crend.spriteE.spritePoliUpdated, crend.spriteE.spritePoli, deltaTime) ;
             DrawDemonShape(crend.spriteE.spritePoliUpdated, crend.spriteE.position, crend.spriteE.color, crend.spriteE.eyes, crend.spriteE.mouth);
            
@@ -236,4 +240,89 @@ void RenderSystem::PaintGameInterface(){
         Rectangle slot = { joyaTargetPos.x - 25, joyaTargetPos.y - 25 + i * 100, 50, 50 }; // Ajusta el tamaño de los recuadros
         DrawRectangleRounded(slot, 0.2f, 4, Fade(GRAY, 0.25f));
     }
+}
+
+void RenderSystem::InitDynamicBackground(){
+    stars.clear();
+    for (int i = 0; i < NUM_STARS; ++i) {
+        Star s;
+        s.pos = { (float)GetRandomValue(0, GetScreenWidth()), (float)GetRandomValue(0, GetScreenHeight()) };
+        s.radius = GetRandomValue(1, 3);
+        s.speed = GetRandomValue(10, 40) / 10.0f;
+        s.alpha = GetRandomValue(50, 255) / 255.0f;
+        stars.push_back(s);
+    }
+}
+
+void RenderSystem::DrawDynamicBackground(){
+    pulseTime += GetFrameTime();
+
+    // --- Dibujar ondas pulsantes ---
+    Vector2 center = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+    for (int i = 0; i < 5; ++i) {
+        float radius = 60 + i * 60 + sinf(pulseTime * 2 + i) * 10;
+        float alpha = 0.2f + 0.1f * sinf(pulseTime * 3 + i);
+        DrawCircleLines(center.x, center.y, radius, Fade(BLUE, alpha));
+    }
+
+    // --- Dibujar estrellas parpadeantes ---
+    for (auto& star : stars) {
+        star.alpha += sinf(pulseTime * star.speed) * 0.01f;
+        if (star.alpha > 1.0f) star.alpha = 1.0f;
+        if (star.alpha < 0.1f) star.alpha = 0.1f;
+
+        DrawCircleV(star.pos, star.radius, Fade(WHITE, star.alpha));
+    }
+}
+
+
+void RenderSystem::DrawEnemyHealthBar(int currentHealth, int maxHealth, int actualLvl) {
+    // Tamaño de la barra
+    const float barWidth  = 300.0f;
+    const float barHeight = 25.0f;
+    
+    // Posición centrada arriba
+    const float screenWidth = GetScreenWidth();
+    const float screenHeight = GetScreenHeight();
+    const Vector2 barPos = { (screenWidth - barWidth) / 2.0f, 150.0f };
+
+    // Proporción de vida actual
+    float healthRatio = (float)currentHealth / (float)maxHealth;
+    if (healthRatio < 0) healthRatio = 0;
+    if (healthRatio > 1) healthRatio = 1;
+
+    // Colores dinámicos: verde → rojo
+    Color lifeColor = {
+        (unsigned char)(255 * (1 - healthRatio)),  // Rojo sube al bajar vida
+        (unsigned char)(255 * healthRatio),        // Verde baja al bajar vida
+        0,
+        255
+    };
+
+    // Dibujar fondo (sombra)
+    DrawRectangleRounded(
+        { barPos.x - 2, barPos.y - 2, barWidth + 4, barHeight + 4 },
+        0.3f, 8, Fade(DARKGRAY, 0.6f)
+    );
+
+    // Dibujar barra vacía
+    DrawRectangleRounded(
+        { barPos.x, barPos.y, barWidth, barHeight },
+        0.3f, 8, Fade(GRAY, 0.5f)
+    );
+
+    // Dibujar barra de vida
+    DrawRectangleRounded(
+        { barPos.x, barPos.y, barWidth * healthRatio, barHeight },
+        0.3f, 8, lifeColor
+    );
+
+    // Opcional: texto encima (nombre del enemigo o porcentaje)
+    std::string enemyName = "LVL " + std::to_string(actualLvl);
+    std::string healthText = std::to_string((int)(healthRatio * 100)) + "% : " + std::to_string(currentHealth) + " / " + std::to_string(maxHealth);
+    int nameWidth = MeasureText(enemyName.c_str(), 18);
+    int healthWidth = MeasureText(healthText.c_str(), 14);
+
+    DrawText(enemyName.c_str(), screenWidth / 2 - nameWidth / 2, barPos.y-25, 18, WHITE);
+    DrawText(healthText.c_str(), screenWidth / 2 - healthWidth / 2, barPos.y + barHeight + 5, 14, LIGHTGRAY);
 }

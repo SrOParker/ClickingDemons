@@ -95,6 +95,19 @@ struct ManEntity {
         
         return e;
     }   
+
+    template <typename...Ts>
+    void eraseEntity(Entity& e){
+        FunctionToEachOneInPackErase<Ts...>(e);
+        auto id = e.getID();
+        auto it = std::find_if(entityarray.begin(), entityarray.end(), [id](auto& ent) {
+            return ent.getID() == id;
+        });
+        if (it != entityarray.end()) {
+            entityarray.erase(it);
+        }
+    }
+
     template<typename TAG>
     void addTagToEntity(Entity& e){
         e.template addTag<TAG>();
@@ -103,6 +116,9 @@ struct ManEntity {
     //template <typename... Ts> void FunctionToEachOneInPack() { addComponentToEntity<>(); }
     template <typename... Ts> 
     void FunctionToEachOneInPack(Entity& e) {  (... , addComponentToEntity<Ts>(e));  }
+
+    template <typename... Ts> 
+    void FunctionToEachOneInPackErase(Entity& e) {  (... , eraseEntityCMP<Ts>(e));  }
     //template <typename T, typename... Ts>
     //void FunctionToEachOneInPack(){
     //    if constexpr (sizeof...(Ts) !=0 ){
@@ -123,6 +139,13 @@ struct ManEntity {
         //create cmp
         return createCMP<CMP>(e);
     };
+
+    template <typename CMP>
+    void eraseEntityCMP(Entity& e){
+        assert(e.template hasComponent<CMP>());
+        auto key = e.template getComponent<CMP>();
+        getComponentStorage().template eraseCMP<CMP>({key.id, key.gen});
+    }
 
     template<typename CMP,typename Data>
     void defineCMP(Entity& e, Data&& dat){

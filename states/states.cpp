@@ -9,7 +9,7 @@ void CreatePlayer(Manentity_type& GE){
     int screenHeight = GetScreenHeight();
     auto& player = GE.createEntity_withCMPS<CmpInformation>();
     player.addTag<TPlayer>();
-    GE.defineCMP<CmpInformation>(player, CmpInformation{1,0,1000,0,"Jugador",0,0});
+    GE.defineCMP<CmpInformation>(player, CmpInformation{1,0,1000,0,0,"Jugador",0,0});
 }
 
 States::States(Manentity_type& GE){
@@ -137,7 +137,7 @@ void States::Juego(Manentity_type& GE){
         
         //System updates
         PS.update(GE);
-        RS.update(GE);
+        RS.update(GE, actualLvl);
         if(lastlvl == 1){
             initLvl = 1;
         }
@@ -146,7 +146,7 @@ void States::Juego(Manentity_type& GE){
             gameLvls.lvl = Level{GE};
             initLvl =0 ;
         }
-        gameLvls.lvl.LvlPlay(GE, RS, PS, IS, InfS);
+        gameLvls.lvl.LvlPlay(GE, RS, PS, IS, InfS, actualLvl);
     }
     //Return menu
     if (IsKeyPressed(KEY_B)) {
